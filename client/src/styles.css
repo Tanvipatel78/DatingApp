@@ -1,1 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+.form-control{
+  margin-right: 6px/* You can add global styles to this file, and also import other style files */
+}
+.btn:not(:disabled):not(.disabled) {
+  cursor: pointer;
+  margin-right: 8px;
+}
