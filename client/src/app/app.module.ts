@@ -18,9 +18,9 @@ import { MemberDetailComponent } from './members/member-detail/member-detail.com
 import { ListsComponent } from './lists/lists.component';
 import { MessagesComponent } from './messages/messages.component';
 import { ToastrModule } from 'ngx-toastr';
-import { TestErrorsComponent } from './Errors/test-errors/test-errors.component';
-import { NotFoundComponent } from './Errors/not-found/not-found.component';
-import { ServerErrorComponent } from './Errors/server-error/server-error.component';
+import { TestErrorsComponent } from './errors/test-errors/test-errors.component';
+import { NotFoundComponent } from './errors/not-found/not-found.component';
+import { ServerErrorComponent } from './errors/server-error/server-error.component';
 
 
 
@@ -36,7 +36,7 @@ import { ServerErrorComponent } from './Errors/server-error/server-error.compone
     MessagesComponent,
     TestErrorsComponent,
     NotFoundComponent,
-    ServerErrorComponent
+    ServerErrorComponent,
   ],
   imports: [
     BrowserModule,
@@ -47,7 +47,7 @@ import { ServerErrorComponent } from './Errors/server-error/server-error.compone
     SharedModule
   ],
   providers: [
-    {provide:HTTP_INTERCEPTORS,useClass:ErrorInterceptor,multi:true}
+    {provide: HTTP_INTERCEPTORS,useClass:ErrorInterceptor,multi:true}
   ],
   bootstrap: [AppComponent]
 })
