@@ -7,6 +7,7 @@ using System;
 
 namespace API.Controllers
 {
+    [Authorize]
     public class BuggyController :BaseApiController
     {
         private readonly DataContext _context;
