@@ -13,6 +13,7 @@ export class AcccountService {
 baseUrl = environment.apiUrl;
 private currentUserSource = new ReplaySubject<User>(1);
 currentUser$ = this.currentUserSource.asObservable();
+
   constructor(private http: HttpClient) {
 }
 
@@ -21,8 +22,7 @@ login(model : any){
     map((response : User) =>{
       const user = response;
       if(user){
-        localStorage.setItem('user',JSON.stringify(user));
-        this.currentUserSource.next(user);
+        this.setCurrentUser(user);
       }
     })
   )
@@ -34,12 +34,12 @@ register(model: any) {
     map((user: User) => {
       if (user) {
        this.setCurrentUser(user);
-       this.currentUserSource.next(user);
       }
     })
   )
 }
 setCurrentUser(user :User){
+  localStorage.setItem('user',JSON.stringify(user));
   this.currentUserSource.next(user);
 }
 
