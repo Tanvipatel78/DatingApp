@@ -1,12 +1,12 @@
-import { Photo } from './../../_models/photo';
+import { MembersService } from './../../_services/members.service';
 import { AcccountService } from './../../_services/acccount.service';
 import { environment } from './../../../environments/environment';
-import { FileUploader} from 'ng2-file-upload';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FileUploader } from 'ng2-file-upload';
 import { Member } from 'src/app/_models/member';
 import { take } from 'rxjs/operators';
 import { User } from 'src/app/_models/user';
-import { MembersService } from 'src/app/_services/members.service';
+import { Photo } from 'src/app/_models/photo';
 
 @Component({
   selector: 'app-photo-editor',
@@ -14,32 +14,30 @@ import { MembersService } from 'src/app/_services/members.service';
   styleUrls: ['./photo-editor.component.css']
 })
 export class PhotoEditorComponent implements OnInit {
-  @Input() member: Member;
-  uploader: FileUploader;
-  hasBaseDropzoneOver = false;
-  baseUrl = environment.apiUrl;
-  user: User;
+@Input() member: Member;
+uploader: FileUploader;
+hasBaseDropzoneOver = false;
+baseUrl = environment.apiUrl;
+user: User;
 
-  constructor(private accountservice: AcccountService,private memberservice:  MembersService) {
-    this.accountservice.currentUser$.pipe(take(1)).subscribe(user => this.user=user);
-  }
+constructor(private accountservice: AcccountService,private memberservice:  MembersService) {
+  this.accountservice.currentUser$.pipe(take(1)).subscribe(user => this.user=user);
+}
 
   ngOnInit(): void {
     this.initializeUploader();
   }
 
-  fileOverBase(e: any)
-  {
+  fileOverBase(e: any){
     this.hasBaseDropzoneOver = e;
   }
 
-  setMainPhoto(photo : Photo)
-  {
+  setMainPhoto(photo: Photo) {
     this.memberservice.setMainPhoto(photo.id).subscribe(() => {
-        this.user.photoUrl = photo.url;
-        this.accountservice.setCurrentUser(this.user);
-        this.member.photoUrl = photo.url;
-        this.member.photos.forEach(p => {
+      this.user.photoUrl = photo.url;
+      this.accountservice.setCurrentUser(this.user);
+      this.member.photoUrl = photo.url;
+      this.member.photos.forEach(p => {
         if (p.isMain) p.isMain = false;
         if (p.id === photo.id) p.isMain = true;
       })
@@ -47,15 +45,15 @@ export class PhotoEditorComponent implements OnInit {
   }
 
   deletePhoto(photoId: number) {
-    this.memberservice.deletePhoto(photoId).subscribe(() => {
+    this.memberservice.deletePhoto(photoId).subscribe( () => {
       this.member.photos = this.member.photos.filter(x => x.id !== photoId);
     })
   }
 
-  initializeUploader(){
+  initializeUploader() {
     this.uploader = new FileUploader({
-      url: this.baseUrl + 'users/add-photo',
-      authToken: 'Bearer' + this.user.token,
+      url:this.baseUrl + 'users/add-photo',
+      authToken: 'Bearer ' + this.user.token,
       isHTML5: true,
       allowedFileType: ['image'],
       removeAfterUpload: true,
@@ -66,14 +64,18 @@ export class PhotoEditorComponent implements OnInit {
     this.uploader.onAfterAddingFile = (file) => {
       file.withCredentials = false;
     }
-    this.uploader.onSuccessItem = (item, response,status,headers) =>
-    {
-      if(response){
-        const photo =JSON.parse(response);
+
+    this.uploader.onSuccessItem = (item, response, status, headers) => {
+      if(response) {
+        const photo: Photo = JSON.parse(response);
         this.member.photos.push(photo);
+         if(photo.isMain) {
+           this.user.photoUrl = photo.url;
+           this.member.photoUrl = photo.url;
+           this.accountservice.setCurrentUser(this.user);
+         }
       }
     }
-
   }
 
 }
