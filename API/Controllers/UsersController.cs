@@ -8,6 +8,8 @@ using API.DTOs;
 using AutoMapper;
 using System.Security.Claims;
 using API.Extensions;
+using API.Helpers;
+using Microsoft.IdentityModel.Tokens;
 
 namespace API.Controllers
 {
@@ -26,10 +28,18 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UserParams userparams)
         {
-           var users = await _userRepository.GetMembersAsync();
+            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+            userparams.CurrentUersname = User.GetUsername();
 
+            if (string.IsNullOrEmpty(userparams.Gender))
+            userparams.Gender = user.Gender == "male" ? "female" : "male";
+
+           var users = await _userRepository.GetMembersAsync(userparams);
+
+            Response.AddPaginationHeader(users.CurrentPage, users.PageSize,
+                users.TotalCount, users.TotalPages);
            return Ok(users);
         }
 
